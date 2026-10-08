@@ -1,7 +1,13 @@
-import type { EnvironmentId, UsageLimitsReport } from "@t3tools/contracts";
+import type {
+  EnvironmentId,
+  ProviderInstanceId,
+  ServerProvider,
+  UsageLimitsReport,
+} from "@t3tools/contracts";
 import { limitsNotice } from "@t3tools/shared/usageLimits";
 import { GaugeIcon } from "lucide-react";
 
+import { useNowMinute } from "../../hooks/useNowMinute";
 import { ensureLocalApi } from "../../localApi";
 import { Button } from "../ui/button";
 import { getDriverOption } from "../settings/providerDriverMeta";
@@ -133,5 +139,42 @@ function UsageLimitsBannerBody({
         ))}
       </ComposerBanner.Body>
     </ComposerBanner.Scroll>
+  );
+}
+
+const CLAUDE_DRIVER = "claudeAgent";
+const DRAFT_WINDOW_IDS = ["five_hour", "seven_day"];
+
+/**
+ * Claude's 5-hour and 7-day windows under the new-thread composer. Prefers the
+ * selected instance when it is Claude, otherwise the first Claude instance
+ * reporting windows; renders nothing when no Claude account has any.
+ */
+export function DraftClaudeUsageLimits({
+  providers,
+  activeInstanceId,
+}: {
+  readonly providers: ReadonlyArray<ServerProvider>;
+  readonly activeInstanceId: ProviderInstanceId | null;
+}) {
+  // Ticks each minute so countdowns stay current while the draft sits open.
+  const now = Date.parse(`${useNowMinute()}:00Z`);
+  const windowsOf = (provider: ServerProvider) =>
+    (provider.usageLimits?.windows ?? []).filter((window) => DRAFT_WINDOW_IDS.includes(window.id));
+  const claudeProviders = providers.filter(
+    (provider) => provider.enabled && provider.driver === CLAUDE_DRIVER,
+  );
+  const provider =
+    claudeProviders.find(
+      (candidate) => candidate.instanceId === activeInstanceId && windowsOf(candidate).length > 0,
+    ) ?? claudeProviders.find((candidate) => windowsOf(candidate).length > 0);
+  if (!provider) return null;
+  const windows = windowsOf(provider).toSorted(
+    (a, b) => DRAFT_WINDOW_IDS.indexOf(a.id) - DRAFT_WINDOW_IDS.indexOf(b.id),
+  );
+  return (
+    <div className="px-3">
+      <LimitWindows compact driver={provider.driver} windows={windows} now={now} />
+    </div>
   );
 }

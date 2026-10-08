@@ -36,7 +36,7 @@ import {
   isUsageLimitsCommand,
 } from "@t3tools/shared/usageLimits";
 import { feedbackBannerItem } from "./chat/ComposerFeedback";
-import { usageLimitsBannerItem } from "./chat/ComposerUsageLimits";
+import { DraftClaudeUsageLimits, usageLimitsBannerItem } from "./chat/ComposerUsageLimits";
 import { getTerminalLabel } from "@t3tools/shared/terminalLabels";
 import * as Schema from "effect/Schema";
 import {
@@ -11732,6 +11732,14 @@ export default function ChatView(props: ChatViewProps) {
                       aria-hidden
                       className="h-[calc(env(safe-area-inset-bottom)+1rem)] sm:h-[calc(env(safe-area-inset-bottom)+1.25rem)]"
                     />
+                    {isDraftHeroState ? (
+                      <div className="absolute inset-x-0 top-full">
+                        <DraftClaudeUsageLimits
+                          providers={providerStatuses}
+                          activeInstanceId={activeProviderInstanceId}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
