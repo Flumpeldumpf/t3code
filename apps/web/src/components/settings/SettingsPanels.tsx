@@ -619,6 +619,9 @@ export function useSettingsRestore(onRestored?: () => void) {
       ...(settings.followUpBehavior !== DEFAULT_UNIFIED_SETTINGS.followUpBehavior
         ? ["Follow-up behavior"]
         : []),
+      ...(settings.startNewThreadAfterSend !== DEFAULT_UNIFIED_SETTINGS.startNewThreadAfterSend
+        ? ["Start new thread after send"]
+        : []),
       ...(settings.contextWindowMeterEnabled !== DEFAULT_UNIFIED_SETTINGS.contextWindowMeterEnabled
         ? ["Context window indicator"]
         : []),
@@ -683,6 +686,7 @@ export function useSettingsRestore(onRestored?: () => void) {
       settings.composerRichTextEnabled,
       settings.sendShortcut,
       settings.followUpBehavior,
+      settings.startNewThreadAfterSend,
       settings.addProjectBaseDirectory,
       settings.defaultThreadEnvMode,
       settings.newWorktreesStartFromOrigin,
@@ -805,6 +809,7 @@ export function useSettingsRestore(onRestored?: () => void) {
       composerRichTextEnabled: DEFAULT_UNIFIED_SETTINGS.composerRichTextEnabled,
       sendShortcut: DEFAULT_UNIFIED_SETTINGS.sendShortcut,
       followUpBehavior: DEFAULT_UNIFIED_SETTINGS.followUpBehavior,
+      startNewThreadAfterSend: DEFAULT_UNIFIED_SETTINGS.startNewThreadAfterSend,
       contextWindowMeterEnabled: DEFAULT_UNIFIED_SETTINGS.contextWindowMeterEnabled,
       environmentIdentificationMode: DEFAULT_UNIFIED_SETTINGS.environmentIdentificationMode,
       glassOpacity: DEFAULT_UNIFIED_SETTINGS.glassOpacity,
@@ -2835,6 +2840,33 @@ export function GeneralSettingsPanel() {
                 ))}
               </SelectPopup>
             </Select>
+          }
+        />
+
+        <SettingsRow
+          {...searchableSetting("start-new-thread-after-send")}
+          description="After sending a prompt, leave the thread running and open a fresh composer for your next one."
+          resetAction={
+            settings.startNewThreadAfterSend !==
+            DEFAULT_UNIFIED_SETTINGS.startNewThreadAfterSend ? (
+              <SettingResetButton
+                label="start new thread after send"
+                onClick={() =>
+                  updateSettings({
+                    startNewThreadAfterSend: DEFAULT_UNIFIED_SETTINGS.startNewThreadAfterSend,
+                  })
+                }
+              />
+            ) : null
+          }
+          control={
+            <Switch
+              checked={settings.startNewThreadAfterSend}
+              onCheckedChange={(checked) =>
+                updateSettings({ startNewThreadAfterSend: Boolean(checked) })
+              }
+              aria-label="Start new thread after send"
+            />
           }
         />
 

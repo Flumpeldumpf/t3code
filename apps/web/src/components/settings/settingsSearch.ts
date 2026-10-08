@@ -413,6 +413,12 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["enter return command ctrl multiline prompt new line composer"],
   },
   {
+    id: "start-new-thread-after-send",
+    title: "Start new thread after send",
+    to: "/settings/general",
+    searchTerms: ["send background next prompt fresh composer draft close thread enter"],
+  },
+  {
     id: "follow-up-behavior",
     title: "Follow-up behavior",
     to: "/settings/general",

@@ -4215,6 +4215,12 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         });
         return;
       }
+      const effectiveSubmissionIntent =
+        settings.startNewThreadAfterSend &&
+        !activePendingProgress &&
+        (submissionIntent === undefined || submissionIntent === "foreground")
+          ? "background"
+          : submissionIntent;
       const submission = submitComposerDraft({
         prompt: promptRef.current,
         submissionTarget: activePendingProgress ? "pending-user-input" : "provider-turn",
@@ -4231,7 +4237,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 alternateModifier: false,
                 activeTurnDefault: settings.followUpBehavior,
               }),
-            submissionIntent,
+            effectiveSubmissionIntent,
           );
           return !providerInputRejectedRef.current;
         },
@@ -4252,6 +4258,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       noProviderAvailable,
       onSend,
       settings.followUpBehavior,
+      settings.startNewThreadAfterSend,
       phase,
       promptRef,
       shouldBlurMobileComposerOnSubmit,
